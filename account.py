@@ -167,13 +167,13 @@ def account():
                     if st.button("Forgot Password?"):
                         st.session_state.show_forgot_pw = not st.session_state.get("show_forgot_pw", False)
                 
-                login_submit = st.button("Login", type="primary")
+                login_submit = st.button("Login")
 
                 if st.session_state.get("show_forgot_pw", False):
                     st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
                     st.markdown("<p style='font-size: 14px; margin-bottom: 5px;'><b>Reset Password</b></p>", unsafe_allow_html=True)
                     reset_email = st.text_input("Enter your registered Email to get a reset link", placeholder="Email")
-                    if st.button("Send Reset Link", type="primary"):
+                    if st.button("Send Reset Link"):
                         if reset_email:
                             reset_url = f"https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={API_KEY}"
                             requests.post(reset_url, json={"requestType": "PASSWORD_RESET", "email": reset_email})
@@ -502,7 +502,7 @@ def account():
                 st.markdown(f"**Phone Number:** &nbsp; {current_phone or 'Not Set'}")
                 
                 st.write("")
-                if st.button("Edit Profile ✏️", type="primary"):
+                if st.button("Edit Profile ✏️"):
                     st.session_state.edit_profile = True
                     st.rerun()
         else:
@@ -521,7 +521,7 @@ def account():
                     st.caption("Doctor name cannot be changed.")
                 else:
                     new_patient_name = st.text_input("Full Name", placeholder="Enter your full name", key="prof_patient_name")
-                    if st.button("Save Name", type="primary", key="save_patient_name"):
+                    if st.button("Save Name", key="save_patient_name"):
                         if new_patient_name.strip():
                             try:
                                 auth.update_user(uid, display_name=new_patient_name.strip())
@@ -571,7 +571,7 @@ def account():
                     st.caption(f"⏳ OTP expires in {max(0, remaining)} seconds")
                     col1, col2 = st.columns(2)
                     with col1:
-                        if st.button("Verify & Update Email", type="primary", key="prof_verify_otp"):
+                        if st.button("Verify & Update Email", key="prof_verify_otp"):
                             if str(entered_otp).strip() == str(st.session_state.prof_generated_otp):
                                 try:
                                     auth.update_user(uid, email=st.session_state.prof_new_email, email_verified=True)
@@ -626,7 +626,7 @@ def account():
                     std_code = countries[country]
                 with c2:
                     new_phone = st.text_input(f"New Phone Number ({std_code})", key="prof_phone")
-                if st.button("Update Phone", type="primary", key="save_phone"):
+                if st.button("Update Phone", key="save_phone"):
                     if not new_phone.strip().isdigit():
                         st.error("❌ Digits only please.")
                     else:
