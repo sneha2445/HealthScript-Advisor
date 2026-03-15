@@ -4,10 +4,16 @@ from typing import Generator
 from utils.config import get_secret
 
 def medical_chatbot():
-    # connecting to groq cloud here.
-    api_key = get_secret("Grok")
+    # Try the standard name first, then the fallback 'Grok'
+    api_key = get_secret("GROQ_API_KEY") or get_secret("Grok")
+    
     if not api_key:
-        st.error("❌ Groq API Key ('Grok') is missing. Please add it to your Streamlit Secrets or .env file.")
+        st.error("❌ Groq API Key is missing.")
+        st.info("""
+        **How to fix this:**
+        1. **On Streamlit Cloud:** Add `GROQ_API_KEY = "your_key_here"` to your **Secrets**.
+        2. **On your Computer:** Add `GROQ_API_KEY=your_key_here` to your `.env` file.
+        """)
         st.stop()
         
     client = Groq(api_key=api_key)
