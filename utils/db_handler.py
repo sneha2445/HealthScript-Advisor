@@ -8,16 +8,22 @@ load_dotenv()
 
 @st.cache_resource
 def get_mysql_connection():
+    host = os.getenv("MYSQL_HOST", "localhost")
+    
+    # If host is a placeholder or we are on Streamlit Cloud trying to reach localhost
+    if host == "your_database_host" or (host == "localhost" and os.getenv("STREAMLIT_RUNTIME_ENV") == "cloud"):
+        return None
+        
     try:
         conn = mysql.connector.connect(
-            host=os.getenv("MYSQL_HOST", "localhost"),
+            host=host,
             user=os.getenv("MYSQL_USER", "root"),
             password=os.getenv("MYSQL_PASSWORD", "sneha"),
-            database=os.getenv("MYSQL_DATABASE", "docbuddy_db")
+            database=os.getenv("MYSQL_DATABASE", "docbuddy_db"),
+            connect_timeout=5 # Don't hang the app
         )
         return conn
-    except Exception as e:
-        st.warning(f"Database connection failed: {e}. Falling back to offline mode.")
+    except Exception:
         return None
 
 @st.cache_data
