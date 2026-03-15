@@ -25,7 +25,6 @@ from groq import Groq
 from langdetect import detect
 from translate import Translator
 # from firebase_admin import firestore
-from google.auth import exceptions as google_exceptions
 warnings.filterwarnings("ignore")
 load_dotenv()
 try:
