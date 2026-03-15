@@ -216,31 +216,36 @@ def account():
                             st.rerun()
 
                     try:
+                        login_input = login_input.strip()
                         email_to_login = login_input
                         display_name = login_input
+                        
+                        # Check if it's a Username instead of an Email
                         if "@" not in login_input:
+                            found_email = None
                             try:
-                                # Try as UID first
-                                user_record = auth.get_user(login_input)
-                                email_to_login = user_record.email
-                            except Exception:
-                                # Fallback: Search Firestore 'users' collection for this username
+                                # Try as Firebase UID first (high speed)
+                                u_record = auth.get_user(login_input)
+                                found_email = u_record.email
+                                display_name = u_record.display_name or login_input
+                            except:
+                                # Fallback: Search Firestore for custom username field
                                 try:
                                     from firebase_admin import firestore
-                                    db = firestore.client()
-                                    # Documents are indexed by email, so we search the 'username' field
-                                    u_query = db.collection("users").where("username", "==", login_input).limit(1).stream()
-                                    u_found = False
-                                    for u_doc in u_query:
-                                        email_to_login = u_doc.id # Document ID is the user email
-                                        u_found = True
-                                        break
-                                    if not u_found:
-                                        st.error("❌ Username not found.")
-                                        return
-                                except Exception:
-                                    st.error("❌ Username not found.")
-                                    return
+                                    f_db = firestore.client()
+                                    u_query = f_db.collection("users").where("username", "==", login_input).limit(1).get()
+                                    if u_query:
+                                        u_data = u_query[0].to_dict()
+                                        found_email = u_data.get("email")
+                                        display_name = u_data.get("name", login_input)
+                                except Exception as fe:
+                                    print(f"Firestore lookup error: {fe}")
+                            
+                            if found_email:
+                                email_to_login = found_email
+                            else:
+                                st.error("❌ Username not found. Please register first or use your Email.")
+                                return
                         
                         login_url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={API_KEY}"
                         payload = {"email": email_to_login, "password": password, "returnSecureToken": True}
