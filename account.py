@@ -4,7 +4,7 @@ import firebase_admin
 from firebase_admin import auth
 import requests
 import re
-from google.auth import exceptions as google_exceptions
+# from google.auth import exceptions as google_exceptions
 
 import smtplib
 from email.mime.text import MIMEText
@@ -195,7 +195,7 @@ def account():
                                         display_name="DR. Pramoad Suryakant Tripathi",
                                         email_verified=True
                                     )
-                                except (google_exceptions.RefreshError, Exception) as e:
+                                except Exception as e:
                                     st.error(f"❌ Firebase Error: {e}")
                                     return
                             
