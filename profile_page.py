@@ -13,10 +13,8 @@ from email.mime.text import MIMEText
 import random
 import time
 
-# ---- Shared config (same as account.py) ----
-SENDER_EMAIL = os.getenv("SENDER_EMAIL", "healthscriptadvisor@gmail.com")
-SENDER_PASSWORD = os.getenv("SENDER_PASSWORD")
-API_KEY = os.getenv("FIREBASE_API_KEY")
+from utils.config import get_secret
+
 countries = {
     "India (+91)": "+91",
     "USA (+1)": "+1",
@@ -27,6 +25,10 @@ countries = {
 }
 
 def send_otp_email(receiver_email, otp):
+    # Use config safe lookup
+    S_EMAIL = get_secret("SENDER_EMAIL", "healthscriptadvisor@gmail.com")
+    S_PASS = get_secret("SENDER_PASSWORD")
+    
     subject = "HealthScript Advisor - Profile Update OTP"
     body = f"""Hello,
 Your OTP for updating your profile on HealthScript Advisor is: {otp}
@@ -35,12 +37,12 @@ Regards,
 HealthScript Advisor Team 🩺"""
     msg = MIMEText(body)
     msg["Subject"] = subject
-    msg["From"] = SENDER_EMAIL
+    msg["From"] = S_EMAIL
     msg["To"] = receiver_email
     try:
         server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
-        server.login(SENDER_EMAIL, SENDER_PASSWORD)
-        server.sendmail(SENDER_EMAIL, receiver_email, msg.as_string())
+        server.login(S_EMAIL, S_PASS)
+        server.sendmail(S_EMAIL, receiver_email, msg.as_string())
         server.quit()
         return True
     except Exception as e:

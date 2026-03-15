@@ -6,24 +6,36 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from utils.config import get_secret
+
 @st.cache_resource
 def get_mysql_connection():
-    host = os.getenv("MYSQL_HOST", "localhost")
+    # Use the safe get_secret utility
+    host = get_secret("MYSQL_HOST", "localhost")
+    user = get_secret("MYSQL_USER", "root")
+    password = get_secret("MYSQL_PASSWORD", "sneha")
+    database = get_secret("MYSQL_DATABASE", "docbuddy_db")
     
-    # If host is a placeholder or we are on Streamlit Cloud trying to reach localhost
-    if host == "your_database_host" or (host == "localhost" and os.getenv("STREAMLIT_RUNTIME_ENV") == "cloud"):
+    # 1. Skip if it's a known placeholder
+    if not host or host.strip() in ["", "your_database_host", "your-mysql-host-here"]:
+        return None
+        
+    # 2. Skip if on Cloud and trying to hit localhost (impossible)
+    is_cloud = os.getenv("STREAMLIT_RUNTIME_ENV") == "cloud" or "STREAMLIT_SERVER_PORT" in os.environ
+    if is_cloud and host == "localhost":
         return None
         
     try:
         conn = mysql.connector.connect(
             host=host,
-            user=os.getenv("MYSQL_USER", "root"),
-            password=os.getenv("MYSQL_PASSWORD", "sneha"),
-            database=os.getenv("MYSQL_DATABASE", "docbuddy_db"),
-            connect_timeout=5 # Don't hang the app
+            user=user,
+            password=password,
+            database=database,
+            connect_timeout=3 # Fast timeout
         )
         return conn
     except Exception:
+        # Completely silent - fallback handles the rest
         return None
 
 @st.cache_data
