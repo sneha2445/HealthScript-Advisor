@@ -149,7 +149,10 @@ def account():
         """, unsafe_allow_html=True)
         
         with st.container(border=True):
-            st.image("static/Login-DocBuddy.png")
+            try:
+                st.image("static/Login-DocBuddy.png")
+            except Exception as e:
+                st.info("Welcome to HealthScript Advisor! Login image not available.")
             if "auth_mode" not in st.session_state:
                 st.session_state.auth_mode = "Login"
 
