@@ -131,5 +131,5 @@ def show_recommendations_page(symptoms_dict, symptoms_list, critical_diseases,
                             st.error(med_warn)
    
     with col2:
-        st.image("static/Docbuddy-Recommendations.png")
+        st.image("static/DocBuddy-Recommendations.png")
 
