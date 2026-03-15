@@ -129,7 +129,9 @@ def show_recommendations_page(symptoms_dict, symptoms_list, critical_diseases,
 
                     st.divider()
                     st.subheader("🌿 Ayurvedic Remedies")
-                    st.info(st.session_state.get("ayurveda", "No remedy available."))
+                    remedies = st.session_state.get("ayurveda", ["No remedy available."])
+                    for r in remedies:
+                        st.info(r)
    
     with col2:
         st.image("static/DocBuddy-Recommendations.png")

@@ -99,18 +99,18 @@ def load_all_csv_data():
     data["precautions"] = data["precautions"].where(pd.notnull(data["precautions"]), None)
     return data
 
-def get_ayurvedic_remedy(disease_name):
-    """Fetch ayurveda remedy from MySQL or fallback to CSV"""
+def get_ayurveda_remedies(disease_name):
+    """Fetch ayurveda remedies from MySQL or fallback to CSV (returns list)"""
     # 1. Try MySQL
     conn = get_mysql_connection()
     if conn:
         try:
             cursor = conn.cursor()
             cursor.execute("SELECT remedy_text FROM ayurvedic_remedies WHERE disease_name = %s", (disease_name,))
-            row = cursor.fetchone()
+            rows = cursor.fetchall()
             conn.close()
-            if row:
-                return row[0]
+            if rows:
+                return [row[0] for row in rows]
         except Exception:
             pass
 
@@ -118,14 +118,13 @@ def get_ayurvedic_remedy(disease_name):
     if os.path.exists("Data/ayurveda.csv"):
         try:
             df = pd.read_csv("Data/ayurveda.csv")
-            # Stripping both search key and dataframe column to avoid space-related mismatches
             clean_search = str(disease_name).strip().lower()
             df["Disease_Clean"] = df["Disease"].str.strip().str.lower()
             
             match = df[df["Disease_Clean"] == clean_search]
             if not match.empty:
-                return match["Remedy"].values[0]
-        except Exception as e:
-            print(f"CSV Remedy Error: {e}")
+                return [match["Remedy"].values[0]]
+        except Exception:
+            pass
             
-    return "No specific Ayurvedic remedy found in database. Please consult an Ayurvedic practitioner."
+    return ["Consult a professional doctor."]

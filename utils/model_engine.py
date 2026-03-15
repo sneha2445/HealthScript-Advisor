@@ -49,6 +49,7 @@ def get_disease_details(disease, data):
     details["diets"] = ast.literal_eval(diet_row['Diet'].values[0]) if not diet_row.empty else []
     
     # Ayurveda
-    details["ayurveda"] = get_ayurvedic_remedy(disease)
+    from utils.db_handler import get_ayurveda_remedies
+    details["ayurveda"] = get_ayurveda_remedies(disease)
 
     return details
