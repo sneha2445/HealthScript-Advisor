@@ -5,7 +5,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowabl
 from datetime import datetime
 import os
 
-def generate_pdf_report(name, age, disease, description, precautions, workouts, diets, medications, vitals, bmi, file_path):
+def generate_pdf_report(name, age, phone, disease, description, precautions, workouts, diets, medications, vitals, bmi, file_path):
     doc = SimpleDocTemplate(file_path, pagesize=letter)
     styles = getSampleStyleSheet()
     styleN = styles['BodyText']
@@ -25,6 +25,8 @@ def generate_pdf_report(name, age, disease, description, precautions, workouts, 
     story.append(Paragraph("Patient Details", styleH2))
     story.append(Paragraph(f"Patient Name : <b>{name.title()}</b>", styleN))
     story.append(Paragraph(f"Patient Age : <b>{age} Years</b>", styleN))
+    if phone:
+        story.append(Paragraph(f"Contact Number : <b>{phone}</b>", styleN))
     story.append(Paragraph(f"Report Generated On : <b>{current_time}</b>", styleN))
     story.append(Spacer(1, 12))
 

@@ -210,6 +210,7 @@ def account():
                             st.session_state.user_mail = "pramoadtri24@gmail.com"
                             st.session_state.user_name = "DR. Pramoad Suryakant Tripathi"
                             st.session_state.user_role = "Doctor"
+                            st.session_state.user_phone = "8197964567"
                             st.session_state.signedOut = True
                             st.session_state.signOut = True
                             st.rerun()
@@ -244,14 +245,23 @@ def account():
                                 try:
                                     db = firestore.client()
                                     user_doc = db.collection("users").document(email_to_login).get()
-                                    role = user_doc.to_dict().get("role", "Patient") if user_doc.exists else "Patient"
+                                    if user_doc.exists:
+                                        u_data = user_doc.to_dict()
+                                        role = u_data.get("role", "Patient")
+                                        phone = u_data.get("phone", "")
+                                        display_name = u_data.get("name", display_name)
+                                    else:
+                                        role = "Patient"
+                                        phone = ""
                                 except:
                                     role = "Patient"
+                                    phone = ""
                                 
                                 st.success("Login Successful 🎉")
                                 st.session_state.user_mail = email_to_login
                                 st.session_state.user_name = display_name
                                 st.session_state.user_role = role
+                                st.session_state.user_phone = phone
                                 st.session_state.signedOut = True
                                 st.session_state.signOut = True
                                 st.rerun()
@@ -401,7 +411,8 @@ def account():
                                     "role": userRole,
                                     "name": patientName.strip(),
                                     "username": userName,
-                                    "email": email
+                                    "email": email,
+                                    "phone": std_code + phone if phone else ""
                                 })
                             except Exception as e:
                                 st.warning(f"⚠️ Account created but profile details could not be saved to Firestore: {e}")

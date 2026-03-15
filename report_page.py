@@ -10,8 +10,11 @@ def show_generate_report():
             st.divider()
             
             c1, c2 = st.columns(2)
-            name = c1.text_input("Patient Name", placeholder="e.g. John Doe")
+            name = c1.text_input("Patient Name", placeholder="e.g. John Doe", value=st.session_state.get("user_name", ""))
             age = c2.number_input("Patient Age", min_value=1, max_value=120, value=25)
+            
+            # Contact number fetching or manual input
+            phone = st.text_input("Contact Number", value=st.session_state.get("user_phone", ""), placeholder="e.g. +91 9876543210")
             
             if st.button("Generate Health Report ✨", use_container_width=True):
                 if st.session_state.get("predicted"):
@@ -20,7 +23,7 @@ def show_generate_report():
                         try:
                             with st.spinner("Generating PDF..."):
                                 generate_pdf_report(
-                                    name, age,
+                                    name, age, phone,
                                     st.session_state.disease,
                                     st.session_state.description,
                                     st.session_state.precautions,
