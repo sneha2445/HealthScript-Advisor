@@ -6,10 +6,14 @@ from utils.config import get_secret
 def medical_chatbot():
     import os
     
-    # 1. Proactive Safety: Ensure GROQ environment variables are strings
-    # Streamlit Cloud sometimes puts dicts/tables from Secrets into os.environ
+    # 1. Proactive Safety: Clear proxy-related env vars that cause 'proxies' errors
+    # and ensure GROQ environment variables are strings
+    bad_prefixes = ["GROQ_", "HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "http_proxy", "https_proxy", "all_proxy"]
     for env_key in list(os.environ.keys()):
-        if env_key.startswith("GROQ_") and env_key != "GROQ_API_KEY":
+        # Clear specific proxy keys or non-string GROQ keys
+        if any(prefix in env_key for prefix in ["HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY"]):
+             del os.environ[env_key]
+        elif env_key.startswith("GROQ_") and env_key != "GROQ_API_KEY":
             if not isinstance(os.environ[env_key], str):
                 del os.environ[env_key]
 
