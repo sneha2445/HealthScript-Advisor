@@ -88,7 +88,8 @@ def load_all_csv_data():
     return data
 
 def get_ayurvedic_remedy(disease_name):
-    """Fetch ayurveda remedy from MySQL if available"""
+    """Fetch ayurveda remedy from MySQL or fallback to CSV"""
+    # 1. Try MySQL
     conn = get_mysql_connection()
     if conn:
         try:
@@ -100,4 +101,15 @@ def get_ayurvedic_remedy(disease_name):
                 return row[0]
         except Exception:
             pass
+
+    # 2. Try CSV Fallback (for Cloud/Offline)
+    if os.path.exists("Data/ayurveda.csv"):
+        try:
+            df = pd.read_csv("Data/ayurveda.csv")
+            match = df[df["Disease"].str.lower() == disease_name.lower()]
+            if not match.empty:
+                return match["Remedy"].values[0]
+        except Exception:
+            pass
+            
     return "No specific Ayurvedic remedy found in database. Please consult an Ayurvedic practitioner."
