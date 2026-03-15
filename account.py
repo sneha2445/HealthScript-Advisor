@@ -173,7 +173,7 @@ def account():
                     st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
                     st.markdown("<p style='font-size: 14px; margin-bottom: 5px;'><b>Reset Password</b></p>", unsafe_allow_html=True)
                     reset_email = st.text_input("Enter your registered Email to get a reset link", placeholder="Email")
-                    if st.button("Send Reset Link", type="primary", width="stretch"):
+                    if st.button("Send Reset Link", type="primary"):
                         if reset_email:
                             reset_url = f"https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={API_KEY}"
                             requests.post(reset_url, json={"requestType": "PASSWORD_RESET", "email": reset_email})
