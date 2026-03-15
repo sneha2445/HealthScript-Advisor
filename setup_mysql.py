@@ -84,18 +84,29 @@ def setup_database():
                 cursor.execute("INSERT IGNORE INTO critical_list (disease_name) VALUES (%s)", (d,))
             except: pass
 
-        # 6. Sample Ayurvedic Remedies
-        print("Populating sample ayurvedic remedies...")
-        remedies = [
-            ("Fungal infection", "Apply neem oil or turmeric paste to the affected area."),
-            ("Allergy", "Consume a teaspoon of honey or drink ginger tea to reduce inflammation."),
-            ("Diabetes", "Include bitter gourd (Karela) and fenugreek seeds in your diet."),
-            ("Hypertension", "Practice Savasana and take Ashwagandha supplements after consulting a practitioner.")
-        ]
-        for d, r in remedies:
-            try:
-                cursor.execute("INSERT INTO ayurvedic_remedies (disease_name, remedy_text) VALUES (%s, %s)", (d, r))
-            except: pass
+        # 6. Ayurvedic Remedies (from CSV)
+        print("Populating ayurvedic remedies from CSV...")
+        if os.path.exists("Data/ayurveda.csv"):
+            adf = pd.read_csv("Data/ayurveda.csv")
+            for _, row in adf.iterrows():
+                try:
+                    cursor.execute(
+                        "INSERT IGNORE INTO ayurvedic_remedies (disease_name, remedy_text) VALUES (%s, %s)", 
+                        (row['Disease'].strip(), row['Remedy'].strip())
+                    )
+                except: pass
+        else:
+            # Fallback for very basic setup
+            remedies = [
+                ("Fungal infection", "Apply neem oil or turmeric paste to the affected area."),
+                ("Allergy", "Consume a teaspoon of honey or drink ginger tea."),
+                ("Diabetes", "Include bitter gourd (Karela) and fenugreek seeds in your diet."),
+                ("Hypertension", "Practice Savasana and take Ashwagandha supplements.")
+            ]
+            for d, r in remedies:
+                try:
+                    cursor.execute("INSERT IGNORE INTO ayurvedic_remedies (disease_name, remedy_text) VALUES (%s, %s)", (d, r))
+                except: pass
 
         conn.commit()
         print("\n✅ Database Setup Complete!")

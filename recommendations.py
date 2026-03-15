@@ -78,6 +78,7 @@ def show_recommendations_page(symptoms_dict, symptoms_list, critical_diseases,
                         
                         st.session_state.vitals = vitals
                         st.session_state.bmi = bmi
+                        st.session_state.predicted = True
                         
                         save_prediction_history(
                             st.session_state.get("user_mail"), 
