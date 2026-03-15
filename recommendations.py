@@ -27,33 +27,31 @@ def show_recommendations(symptoms_dict, symptoms_list, critical_diseases,
             st.divider()
 
             # --- STEP 2: VITALS ---
-            @st.fragment
-            def vitals_section():
-                st.subheader("Step 2: Enter Vitals & BMI 💓")
-                v1, v2, v3 = st.columns(3)
-                spo2 = v1.number_input("SpO2 Level (%)", 70, 100, 98, key="rec_spo2")
-                temp = v2.number_input("Body Temperature (°F)", 95.0, 108.0, 98.6, key="rec_temp")
-                bp = v3.number_input("Systolic BP", 80, 220, 120, key="rec_bp")
+            st.subheader("Step 2: Enter Vitals & BMI 💓")
+            v1, v2, v3 = st.columns(3)
+            spo2 = v1.number_input("SpO2 Level (%)", 70, 100, 98, key="rec_spo2")
+            temp = v2.number_input("Body Temperature (°F)", 95.0, 108.0, 98.6, key="rec_temp")
+            bp = v3.number_input("Systolic BP", 80, 220, 120, key="rec_bp")
+            
+            st.markdown("**Body Mass Index (BMI) Calculator ⚖️**")
+            bmi_col1, bmi_col2, bmi_col3 = st.columns(3)
+            
+            with bmi_col1:
+                weight = st.number_input("Weight (kg)", 10.0, 300.0, 70.0, key="rec_weight")
+            with bmi_col2:
+                height_cm = st.number_input("Height (cm)", 50.0, 250.0, 170.0, key="rec_height")
+            with bmi_col3:
+                bmi = weight / ((height_cm / 100) ** 2)
+                st.metric(label="Calculated BMI", value=f"{bmi:.1f}")
                 
-                st.markdown("**Body Mass Index (BMI) Calculator ⚖️**")
-                bmi_col1, bmi_col2, bmi_col3 = st.columns(3)
-                
-                with bmi_col1:
-                    weight = st.number_input("Weight (kg)", 10.0, 300.0, 70.0, key="rec_weight")
-                with bmi_col2:
-                    height_cm = st.number_input("Height (cm)", 50.0, 250.0, 170.0, key="rec_height")
-                with bmi_col3:
-                    bmi = weight / ((height_cm / 100) ** 2)
-                    st.metric(label="Calculated BMI", value=f"{bmi:.1f}")
-                    
-                    if bmi < 18.5: bmi_status = "Underweight 🔵"
-                    elif 18.5 <= bmi <= 24.9: bmi_status = "Normal weight 🟢"
-                    elif 25 <= bmi <= 29.9: bmi_status = "Overweight 🟡"
-                    else: bmi_status = "Obese 🔴"
-                    st.caption(f"Status: **{bmi_status}**")
-                return spo2, temp, bp, weight, height_cm, bmi
-
-            spo2, temp, bp, weight, height_cm, bmi = vitals_section()
+                if bmi < 18.5: bmi_status = "Underweight 🔵"
+                elif 18.5 <= bmi <= 24.9: bmi_status = "Normal weight 🟢"
+                elif 25 <= bmi <= 29.9: bmi_status = "Overweight 🟡"
+                else: bmi_status = "Obese 🔴"
+                st.write(f"**Status:** {bmi_status}")
+            
+            # Return values for use in the main function
+            vitals_data = {"spo2": spo2, "temp": temp, "bp": bp, "weight": weight, "height": height_cm, "bmi": bmi}
             st.divider()
 
             # --- STEP 3: SYMPTOMS ---
