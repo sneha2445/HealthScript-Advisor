@@ -6,9 +6,9 @@ from streamlit_option_menu import option_menu
 import pandas as pd
 import numpy as np
 import pickle
-# import firebase_admin
-# from firebase_admin import credentials
-# from firebase_admin import auth
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import auth
 import requests
 import json
 import ast
@@ -24,17 +24,9 @@ from typing import Generator
 from groq import Groq
 from langdetect import detect
 from translate import Translator
-# from firebase_admin import firestore
+from firebase_admin import firestore
 warnings.filterwarnings("ignore")
 load_dotenv()
-try:
-    import firebase_admin
-    from firebase_admin import credentials
-    from firebase_admin import auth
-    from firebase_admin import firestore
-    firebase_available = True
-except ImportError:
-    firebase_available = False
 import streamlit as st
 
 from recommendations import show_recommendations

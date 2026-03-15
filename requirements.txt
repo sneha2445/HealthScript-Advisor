@@ -7,5 +7,6 @@ python-dotenv==1.0.1
 groq==0.11.0
 langdetect==1.0.9
 mysql-connector-python==8.2.0
+firebase-admin==6.5.0
 reportlab==4.0.7
 translate==3.6.1
