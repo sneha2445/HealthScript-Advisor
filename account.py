@@ -149,7 +149,7 @@ def account():
         """, unsafe_allow_html=True)
         
         with st.container(border=True):
-            st.image(r"static\\Login-DocBuddy.png", width="stretch")
+            st.image("static/Login-DocBuddy.png", use_container_width=True)
             if "auth_mode" not in st.session_state:
                 st.session_state.auth_mode = "Login"
 
