@@ -93,51 +93,26 @@ def get_db_mappings():
 # Data Load 
 symptoms_dict, diseases_list, symptoms_list, critical_diseases = get_db_mappings()
 
-if firebase_available:
+try:
+    # Try to initialize or refresh the Firebase app
     try:
-        # Try to initialize or refresh the Firebase app
-        try:
-            app = firebase_admin.get_app()
-            # If we reached here, the app is already initialized. 
-            # But if it was initialized with old/broken credentials, we might need to refresh.
-            # For safety in Streamlit, we check a session variable.
-            if not st.session_state.get('firebase_initialized', False):
-                 firebase_admin.delete_app(app)
-                 raise ValueError("Re-initializing")
-        except ValueError:
-            cred = credentials.Certificate(os.getenv("FIREBASE_CREDENTIALS_PATH", "docbuddy-ai-firebase-adminsdk-fbsvc-a2af6aaab6.json"))
-            firebase_admin.initialize_app(cred)
-            st.session_state.firebase_initialized = True
-        
-        firebase_working = True
-        st.session_state.firebase_available = True
-        db = firestore.client()
-    except Exception as e:
-        print(f"Firebase initialization failed: {e}")
-        firebase_working = False
-        st.session_state.firebase_available = False
-        st.session_state.firebase_initialized = False
-        # Create a mock db object to prevent errors
-        class MockDB:
-            def collection(self, name):
-                return MockCollection()
-        class MockCollection:
-            def add(self, data):
-                pass
-            def stream(self):
-                return []
-            def document(self, doc_id):
-                return MockDocument()
-        class MockDocument:
-            def get(self):
-                return MockDoc()
-            def set(self, data, **kwargs):
-                pass
-        class MockDoc:
-            pass
-        db = MockDB()
-        print("Running in offline mode - Firebase not available")
-else:
+        app = firebase_admin.get_app()
+        # If we reached here, the app is already initialized. 
+        # But if it was initialized with old/broken credentials, we might need to refresh.
+        # For safety in Streamlit, we check a session variable.
+        if not st.session_state.get('firebase_initialized', False):
+             firebase_admin.delete_app(app)
+             raise ValueError("Re-initializing")
+    except ValueError:
+        cred = credentials.Certificate(os.getenv("FIREBASE_CREDENTIALS_PATH", "docbuddy-ai-firebase-adminsdk-fbsvc-a2af6aaab6.json"))
+        firebase_admin.initialize_app(cred)
+        st.session_state.firebase_initialized = True
+    
+    firebase_working = True
+    st.session_state.firebase_available = True
+    db = firestore.client()
+except Exception as e:
+    print(f"Firebase initialization failed: {e}")
     firebase_working = False
     st.session_state.firebase_available = False
     st.session_state.firebase_initialized = False
