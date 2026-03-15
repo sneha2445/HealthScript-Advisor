@@ -37,13 +37,14 @@ def show_history(db):
                         # Select relevant columns to display
                         display_df = df[['date', 'patient_name', 'disease', 'severity_status', 'symptoms']]
                         
-                        # --- VIZUALIZATION: SEVERITY TREND ---
-                        st.subheader("🛡️ Health Status Trend")
-                        st.line_chart(display_df.set_index('date')['disease']) # Simple chart
+                        # --- VIZUALIZATION: DISEASE FREQUENCY ---
+                        st.subheader("🛡️ Health Condition Statistics")
+                        disease_counts = display_df['disease'].value_counts()
+                        st.bar_chart(disease_counts)
                         
                         # --- DATA TABLE ---
                         st.subheader("📋 Past Records")
-                        st.dataframe(display_df, width="stretch")
+                        st.dataframe(display_df, use_container_width=True)
 
                         # --- DOCTOR CONSULTATIONS ---
                         st.divider()
@@ -94,5 +95,4 @@ def show_history(db):
             st.markdown("* Then go to the Login Page and Login Yourself.")
             
     with col2:
-        # Keep your existing image reference
-        st.image(r"static\\Docbuddy-Recommendations.png")
+        st.image("static/DocBuddy-Recommendations.png")
