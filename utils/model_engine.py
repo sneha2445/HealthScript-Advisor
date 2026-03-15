@@ -25,6 +25,7 @@ def get_predicted_values(patient_symptoms, symptoms_df):
     return best_disease if best_disease else "Unknown"
 
 def get_disease_details(disease, data):
+    from utils.db_handler import get_ayurvedic_remedy
     details = {}
     
     # Description
@@ -47,4 +48,7 @@ def get_disease_details(disease, data):
     diet_row = data["diets"][data["diets"]['Disease'] == disease]
     details["diets"] = ast.literal_eval(diet_row['Diet'].values[0]) if not diet_row.empty else []
     
+    # Ayurveda
+    details["ayurveda"] = get_ayurvedic_remedy(disease)
+
     return details

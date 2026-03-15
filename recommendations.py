@@ -71,10 +71,7 @@ def show_recommendations_page(symptoms_dict, symptoms_list, critical_diseases,
                         st.session_state.workout = details["workout"]
                         st.session_state.diets = details["diets"]
                         st.session_state.medications = details["medications"]
-                        
-                        # Get Ayurveda (Mocked or passed in)
-                        # For now, let's assume it's part of details or a separate utility
-                        ayurveda = ["Consult a professional doctor."] # Placeholder
+                        st.session_state.ayurveda = details["ayurveda"]
                         
                         sev_status, color, warnings = check_severity(spo2, temp, bp)
                         vitals = {"spo2": spo2, "temp": temp, "bp": bp, "weight": weight, "height": height_cm}
@@ -129,6 +126,10 @@ def show_recommendations_page(symptoms_dict, symptoms_list, critical_diseases,
                             for m in st.session_state.medications: st.write(f"✔️ {m}")
                         else:
                             st.error(med_warn)
+
+                    st.divider()
+                    st.subheader("🌿 Ayurvedic Remedies")
+                    st.info(st.session_state.get("ayurveda", "No remedy available."))
    
     with col2:
         st.image("static/DocBuddy-Recommendations.png")

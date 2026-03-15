@@ -86,3 +86,18 @@ def load_all_csv_data():
     data["precautions"].replace('nan', None, inplace=True)
     data["precautions"] = data["precautions"].where(pd.notnull(data["precautions"]), None)
     return data
+
+def get_ayurvedic_remedy(disease_name):
+    """Fetch ayurveda remedy from MySQL if available"""
+    conn = get_mysql_connection()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT remedy_text FROM ayurvedic_remedies WHERE disease_name = %s", (disease_name,))
+            row = cursor.fetchone()
+            conn.close()
+            if row:
+                return row[0]
+        except Exception:
+            pass
+    return "No specific Ayurvedic remedy found in database. Please consult an Ayurvedic practitioner."
