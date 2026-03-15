@@ -26,12 +26,13 @@ def init_firebase():
             
             return False, None
         except Exception as e:
-            st.error(f"Firebase initialization error: {e}")
+            st.error(f"Firebase initialization error: {str(e)}")
             return False, None
     else:
         try:
             return True, firestore.client()
-        except Exception:
+        except Exception as e:
+            st.error(f"Firestore connection error: {str(e)}")
             return False, None
 
 def get_mock_db():
