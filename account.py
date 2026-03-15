@@ -257,6 +257,16 @@ def account():
                                 st.rerun()
                             else:
                                 st.warning("⚠️ Email not verified. Please check your inbox.")
+                                if st.button("Resend Verification Link"):
+                                    try:
+                                        verify_url = f"https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={API_KEY}"
+                                        v_resp = requests.post(verify_url, json={"requestType": "VERIFY_EMAIL", "idToken": id_token})
+                                        if v_resp.status_code == 200:
+                                            st.success(f"📩 Verification link sent to {email_to_login}!")
+                                        else:
+                                            st.error("❌ Failed to send link. Please try again later.")
+                                    except Exception as e:
+                                        st.error(f"Error: {e}")
                         else:
                             error_detail = resp.json().get("error", {}).get("message", "Unknown error")
                             if error_detail == "INVALID_PASSWORD":
