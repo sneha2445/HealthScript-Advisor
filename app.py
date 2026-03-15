@@ -72,7 +72,7 @@ def get_db_mappings():
         conn.close()
         return s_dict, d_list, s_list, c_list
     except Exception as e:
-        st.warning(f"Database Connection Failed: {e}. Falling back to local data files.")
+        print(f"Database Connection Failed: {e}. Falling back to local data files.")
         try:
             # Fallback 1: Load Symptoms from symptoms_df.csv
             sdf = pd.read_csv("Data/symptoms_df.csv")
