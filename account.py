@@ -27,8 +27,10 @@ def send_email_otp(receiver_email, otp):
     sender_user = get_secret("SENDER_EMAIL", "healthscriptadvisor@gmail.com")
     sender_pass = get_secret("SENDER_PASSWORD")
     
-    if not sender_pass or sender_pass in ["your-google-app-password-here", "your_app_password"]:
-        return False, "SENDER_PASSWORD is not set. Please add it to Streamlit Secrets."
+    if not sender_pass or sender_pass.strip() in ["", "your_app_password", "your-google-app-password-here"]:
+        return False, f"Email Error: 'SENDER_PASSWORD' is not set correctly. (Current value: '{sender_pass}') Please replace placeholders with your real 16-character App Password."
+
+    print(f"DEBUG: Attempting to send OTP from {sender_user}")
 
     subject = "HealthScript Advisor - OTP Verification"
     body = f"""Hello,
