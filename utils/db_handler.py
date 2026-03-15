@@ -100,31 +100,28 @@ def load_all_csv_data():
     return data
 
 def get_ayurveda_remedies(disease_name):
-    """Fetch ayurveda remedies from MySQL or fallback to CSV (returns list)"""
-    # 1. Try MySQL
-    conn = get_mysql_connection()
-    if conn:
-        try:
+    # This version follows your provided snippet for MySQL retrieval
+    try:
+        conn = get_mysql_connection() 
+        if conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT remedy_text FROM ayurvedic_remedies WHERE disease_name = %s", (disease_name,))
+            query = "SELECT remedy_text FROM ayurvedic_remedies WHERE disease_name = %s"
+            cursor.execute(query, (disease_name,))
             rows = cursor.fetchall()
             conn.close()
+
             if rows:
                 return [row[0] for row in rows]
-        except Exception:
-            pass
-
-    # 2. Try CSV Fallback (for Cloud/Offline)
-    if os.path.exists("Data/ayurveda.csv"):
-        try:
+        
+        # Fallback to CSV for Cloud/Offline stability
+        if os.path.exists("Data/ayurveda.csv"):
             df = pd.read_csv("Data/ayurveda.csv")
             clean_search = str(disease_name).strip().lower()
             df["Disease_Clean"] = df["Disease"].str.strip().str.lower()
-            
             match = df[df["Disease_Clean"] == clean_search]
             if not match.empty:
                 return [match["Remedy"].values[0]]
-        except Exception:
-            pass
-            
-    return ["Consult a professional doctor."]
+                
+        return ["Consult a professional doctor."]
+    except Exception as e:
+        return [f"DB Error: {e}"]
