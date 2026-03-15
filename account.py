@@ -185,20 +185,19 @@ def account():
                     st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
 
                 if login_submit:
+                    if not st.session_state.get("firebase_available", False):
+                        st.error("❌ Firebase is not initialized. Please check your credentials file or Streamlit Secrets.")
+                        return
+
                     st.toast("Attempting login...", icon="🔐")
-                    # Enforce Doctor Login for DR. Pramoad Suryakant Tripathi
-                    if login_input == "Tripathipramoad24" or login_input == "pramoadtri24@gmail.com" or login_input == "pramoadtri24@gamil.com":
+                    # Enforce Doctor Login
+                    if login_input == "Tripathipramoad24" or login_input == "pramoadtri24@gmail.com":
                         if password == "Pramoad@1984":
-                            # Create/ensure Firebase user exists for doctor
-                            if not st.session_state.get('firebase_available', True):
-                                st.error("❌ Firebase Authorization Failed: The Service Account key is invalid. Please contact the administrator.")
-                                return
                             try:
                                 user_record = auth.get_user("Tripathipramoad24")
                             except Exception:
-                                # Create doctor user if not exists
                                 try:
-                                    user = auth.create_user(
+                                    auth.create_user(
                                         uid="Tripathipramoad24",
                                         email="pramoadtri24@gmail.com",
                                         password="Pramoad@1984",
@@ -209,8 +208,7 @@ def account():
                                     st.error(f"❌ Firebase Error: {e}")
                                     return
                             
-                            st.success("Login Successful 🎉 Welcome back, DR. Pramoad Suryakant Tripathi!")
-                            st.balloons()
+                            st.success("Login Successful 🎉 Welcome back, Doctor!")
                             st.session_state.user_uid = "Tripathipramoad24"
                             st.session_state.user_mail = "pramoadtri24@gmail.com"
                             st.session_state.user_name = "DR. Pramoad Suryakant Tripathi"
@@ -218,24 +216,18 @@ def account():
                             st.session_state.signedOut = True
                             st.session_state.signOut = True
                             st.rerun()
-                        else:
-                            st.error("❌ Invalid Password for Doctor Account.")
-                            return
 
                     try:
                         email_to_login = login_input
                         display_name = login_input
                         if "@" not in login_input:
                             try:
-                                user_record = auth.get_user(login_input) # UID = Username
+                                user_record = auth.get_user(login_input)
                                 email_to_login = user_record.email
-                                display_name = login_input
-                            except firebase_admin.auth.UserNotFoundError:
-                                st.error("❌ Username not found. Please check or Sign Up.")
+                            except Exception:
+                                st.error("❌ Username not found.")
                                 return
-                        else:
-                            display_name = login_input.split("@")[0] # Default fallback
-                        # Login with Email and Password using REST API
+                        
                         login_url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={API_KEY}"
                         payload = {"email": email_to_login, "password": password, "returnSecureToken": True}
                         resp = requests.post(login_url, json=payload, timeout=10)
@@ -243,25 +235,23 @@ def account():
                         if resp.status_code == 200:
                             user_data = resp.json()
                             id_token = user_data["idToken"]
-                            st.toast("Credentials verified, checking account...", icon="🔍")
-    
-                            # Check if Email is Verified
+                            
+                            # Check verification
                             lookup_url = f"https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={API_KEY}"
                             lookup_resp = requests.post(lookup_url, json={"idToken": id_token})
                             verified = lookup_resp.json()["users"][0]["emailVerified"]
     
                             if verified:
-                                # Fetch user role from Firestore
+                                # Fetch role from Firestore
                                 from firebase_admin import firestore
-                                db = firestore.client()
-                                user_doc = db.collection("users").document(email_to_login).get()
-                                role = "Patient"
-                                if user_doc.exists:
-                                    role = user_doc.to_dict().get("role", "Patient")
+                                try:
+                                    db = firestore.client()
+                                    user_doc = db.collection("users").document(email_to_login).get()
+                                    role = user_doc.to_dict().get("role", "Patient") if user_doc.exists else "Patient"
+                                except:
+                                    role = "Patient"
                                 
-                                # Sab kuch sahi hai, Login Success!
-                                st.success(f"Login Successful 🎉 Welcome back, {display_name}!")
-                                st.balloons()
+                                st.success("Login Successful 🎉")
                                 st.session_state.user_mail = email_to_login
                                 st.session_state.user_name = display_name
                                 st.session_state.user_role = role
@@ -269,20 +259,11 @@ def account():
                                 st.session_state.signOut = True
                                 st.rerun()
                             else:
-                                # Email Verify nahi hai, Link bhejenge
-                                st.warning("⚠️ Email is not verified yet!")
-                                st.info("A Verification Link is being sent to your email. Please click that link to access the features.")                          
-                                verify_url = f"https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={API_KEY}"
-                                requests.post(verify_url, json={"requestType": "VERIFY_EMAIL", "idToken": id_token})
-                                st.success(f"Verification Link successfully sent to {email_to_login} 📩")
+                                st.warning("⚠️ Email not verified.")
                         else:
-                            st.error("❌ Invalid Password or Credentials. Try Again!")
-    
+                            st.error("❌ Invalid credentials.")
                     except Exception as e:
-                        st.error(f"Server Error during Login: {e}")
-                        import traceback
-                        print(f"Login Exception: {e}")
-                        traceback.print_exc()
+                        st.error(f"Login failed: {e}")
                 st.write("")
                 c1, c2 = st.columns([0.65, 0.35])
                 with c1:
