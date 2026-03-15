@@ -3,33 +3,28 @@ import pandas as pd
 from firebase_admin import firestore
 
 def show_doctor_dashboard(db):
+    # --- FETCH DOCTOR INFO ---
+    email = st.session_state.get('user_mail', 'pramoadtri24@gmail.com')
+    try:
+        from firebase_admin import auth as firebase_auth
+        uid = st.session_state.get('user_uid', 'Tripathipramoad24')
+        user_record = firebase_auth.get_user(uid)
+        phone = user_record.phone_number or "8197964567"
+    except:
+        phone = "8197964567"
+
     # --- DOCTOR PROFILE HEADER ---
-    st.markdown("""
+    st.markdown(f"""
         <div style='background-color:#003366; padding:20px; border-radius:10px; color:white !important; margin-bottom:25px;'>
             <h2 style='margin:0; color:white;'>👨‍⚕️ DR. Pramoad Tripathi</h2>
             <p style='font-size:18px; margin:5px 0; color:white;'><b>MBBS | 10+ Years of Experience</b></p>
             <p style='margin:2px 0; color:white;'>📍 Clinic Center: Indira Nagar, Thane West, 400604, Mumbai, Maharashtra</p>
             <p style='margin:2px 0; color:white;'>⏰ Timing: 10:00 AM - 11:00 PM</p>
+            <hr style='border: 0; border_top: 1px solid rgba(255,255,255,0.3); margin: 15px 0;'>
+            <p style='margin:2px 0; color:white;'>📧 <b>Email:</b> {email}</p>
+            <p style='margin:2px 0; color:white;'>📱 <b>Phone:</b> {phone}</p>
         </div>
     """, unsafe_allow_html=True)
-
-    # --- DOCTOR CONTACT INFO ---
-    with st.container(border=True):
-        st.subheader("📋 Doctor Contact Information")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown(f"**📧 Email:** {st.session_state.get('user_mail', 'pramoadtri24@gamil.com')}")
-        with col2:
-            # Get current phone from Firebase Auth or use default
-            try:
-                from firebase_admin import auth as firebase_auth
-                uid = st.session_state.get('user_uid', 'Tripathipramoad24')
-                user_record = firebase_auth.get_user(uid)
-                phone = user_record.phone_number or "8197964567"
-            except:
-                # Fallback to default doctor phone
-                phone = "8197964567"
-            st.markdown(f"**📱 Phone:** {phone}")
     
     st.title("Patient Monitoring Panel")
     st.markdown("---")
