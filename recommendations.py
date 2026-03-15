@@ -1,33 +1,33 @@
 import streamlit as st
 
-def show_recommendations(symptoms_dict, symptoms_list, critical_diseases, 
-                         predict_wrapper, check_severity, save_prediction_history, db):
+def show_recommendations_page(symptoms_dict, symptoms_list, critical_diseases, 
+                          predict_wrapper, check_severity, save_prediction_history, db):
    
     col1, col2 = st.columns([3, 1])
     with col1:
         if st.session_state.get("signedOut", False):
-            st.title(f"Welcome {st.session_state.get('user_name','User')} 🎉")
-            st.header("DocBuddy Recommendation Center 🔮")
+            st.title(f"Welcome {st.session_state.get('user_name','User')}")
+            st.header("Medical Recommendation Center")
             st.divider()
 
             # --- STEP 1: PATIENT DETAILS ---
-            st.subheader("Step 1: Patient Details 👤")
+            st.subheader("Step 1: Patient Details")
             p1, p2, p3 = st.columns(3)
             gender = p1.radio("Gender", ["Male", "Female", "Other"], horizontal=True, key="rec_gender")
             age = p2.number_input("Age", 1, 120, 25, key="rec_age")
             is_pregnant = False
             if gender == "Female":
-                preg = p3.radio("Pregnant? 🤰", ["No", "Yes"], horizontal=True, key="rec_preg")
+                preg = p3.radio("Pregnant?", ["No", "Yes"], horizontal=True, key="rec_preg")
                 is_pregnant = (preg == "Yes")
 
-            st.subheader("Existing Medical Conditions 🏥")
+            st.subheader("Existing Medical Conditions")
             options = ["None"] + critical_diseases + ["Other"]
             existing = st.multiselect("Select if any:", options, default=["None"], key="rec_cond")
             other_cond = st.text_input("Specify 'Other':", key="rec_other") if "Other" in existing else ""
             st.divider()
 
             # --- STEP 2: VITALS ---
-            st.subheader("Step 2: Enter Vitals & BMI 💓")
+            st.subheader("Step 2: Enter Vitals and BMI")
             v1, v2, v3 = st.columns(3)
             spo2 = v1.number_input("SpO2 Level (%)", 70, 100, 98, key="rec_spo2")
             temp = v2.number_input("Body Temperature (°F)", 95.0, 108.0, 98.6, key="rec_temp")

@@ -10,7 +10,7 @@ from utils.session_manager import init_session_state, logout
 from utils.model_engine import get_predicted_values, get_disease_details
 
 # Import page modules
-from recommendations import show_recommendations
+from recommendations import show_recommendations_page
 from home import show_home
 from chatbot import show_chatbot
 from workflow import show_workflow
@@ -157,7 +157,7 @@ elif selected == "Recommendations":
         details = get_disease_details(disease, csv_data)
         return disease, details
 
-    show_recommendations(
+    show_recommendations_page(
         symptoms_dict, symptoms_list, critical_diseases,
         predict_wrapper, check_severity, save_prediction_history, db
     )
