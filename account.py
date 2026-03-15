@@ -379,8 +379,8 @@ def account():
                                 "email": email,
                                 "password": password,
                                 "uid": userName, # Set UID as Username for login capability
-                                "display_name": patientName.strip(), # Display name is the real patient name
-                                "email_verified": False # Forced false so they get verification link on 1st login if needed
+                                "display_name": patientName.strip(),
+                                "email_verified": True # Already verified via 6-digit OTP
                             }
                             if phone:
                                 user_params["phone_number"] = std_code + phone                      
