@@ -1,7 +1,11 @@
 import streamlit as st
 import os
-import firebase_admin
-from firebase_admin import auth
+try:
+    import firebase_admin
+    from firebase_admin import auth
+    firebase_available = True
+except ImportError:
+    firebase_available = False
 import requests
 import re
 # from google.auth import exceptions as google_exceptions
@@ -84,6 +88,9 @@ def validate_username(username):
         return True, ""
     except Exception as e:
         # If some other unexpected error occurs (e.g. network issue)
+    if not firebase_available:
+        st.error("Account and authentication features are currently unavailable due to Firebase configuration.")
+        return
         return False, f"Error validating username: {e}"
     
 #  ACCOUNT CREATION & LOGIN 
