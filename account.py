@@ -90,7 +90,7 @@ def account():
         "India (+91)": "+91", "USA (+1)": "+1", "UK (+44)": "+44",
         "Canada (+1)": "+1", "Australia (+61)": "+61", "Germany (+49)": "+49"
     }
-    API_KEY = get_secret("FIREBASE_WEB_API_KEY")
+    API_KEY = get_secret("FIREBASE_WEB_API_KEY", "AIzaSyB0hr19-_e1nkSjTttPBRT66ZvZ0vhcyyc")
 
     # ---------------- SESSION STATES ----------------
     if "user_role" not in st.session_state:
@@ -256,9 +256,15 @@ def account():
                                 st.session_state.signOut = True
                                 st.rerun()
                             else:
-                                st.warning("⚠️ Email not verified.")
+                                st.warning("⚠️ Email not verified. Please check your inbox.")
                         else:
-                            st.error("❌ Invalid credentials.")
+                            error_detail = resp.json().get("error", {}).get("message", "Unknown error")
+                            if error_detail == "INVALID_PASSWORD":
+                                st.error("❌ Incorrect Password.")
+                            elif error_detail == "EMAIL_NOT_FOUND":
+                                st.error("❌ Email/Username not found.")
+                            else:
+                                st.error(f"❌ Login failed: {error_detail}")
                     except Exception as e:
                         st.error(f"Login failed: {e}")
                 st.write("")
