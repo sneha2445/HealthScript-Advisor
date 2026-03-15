@@ -19,27 +19,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # GMAIL OTP SETTINGS & HELP
-SENDER_EMAIL = os.getenv("SENDER_EMAIL", "healthscriptadvisor@gmail.com")
-SENDER_PASSWORD = os.getenv("SENDER_PASSWORD")
-API_KEY = os.getenv("FIREBASE_WEB_API_KEY") 
-countries = {
-    "India (+91)": "+91",
-    "USA (+1)": "+1",
-    "UK (+44)": "+44",
-    "Canada (+1)": "+1",
-    "Australia (+61)": "+61",
-    "Germany (+49)": "+49"
-}
+from utils.config import get_secret
 
 def send_email_otp(receiver_email, otp):
     """Gmail ke zariye OTP bhejne ka function"""
-    # Read variables inside the function to catch .env updates without restarting the whole app
-    load_dotenv()
-    sender_user = os.getenv("SENDER_EMAIL", "healthscriptadvisor@gmail.com")
-    sender_pass = os.getenv("SENDER_PASSWORD")
-
-    if not sender_pass or sender_pass == "your-google-app-password-here":
-        return False, "SENDER_PASSWORD is not set correctly in your .env file. Please put your 16-character Google App Password there."
+    # Use dynamic lookup to support Cloud Secrets
+    sender_user = get_secret("SENDER_EMAIL", "healthscriptadvisor@gmail.com")
+    sender_pass = get_secret("SENDER_PASSWORD")
+    
+    if not sender_pass or sender_pass in ["your-google-app-password-here", "your_app_password"]:
+        return False, "SENDER_PASSWORD is not set. Please add it to Streamlit Secrets."
 
     subject = "HealthScript Advisor - OTP Verification"
     body = f"""Hello,
@@ -95,6 +84,12 @@ def validate_username(username):
 
 #  ACCOUNT CREATION & LOGIN 
 def account():
+    countries = {
+        "India (+91)": "+91", "USA (+1)": "+1", "UK (+44)": "+44",
+        "Canada (+1)": "+1", "Australia (+61)": "+61", "Germany (+49)": "+49"
+    }
+    API_KEY = get_secret("FIREBASE_WEB_API_KEY")
+
     # ---------------- SESSION STATES ----------------
     if "user_role" not in st.session_state:
         st.session_state.user_role = "Patient"
