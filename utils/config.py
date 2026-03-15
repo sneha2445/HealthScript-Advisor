@@ -22,7 +22,7 @@ def get_secret(key, default=None):
             for k, v in d.items():
                 if isinstance(v, (dict, st.runtime.secrets.AttrDict)):
                     res = find_in_dict(v, target_key)
-                    if res: return res
+                    if res is not None: return res
             return None
 
         val = find_in_dict(st.secrets, key)

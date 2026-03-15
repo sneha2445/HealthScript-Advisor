@@ -4,25 +4,43 @@ from typing import Generator
 from utils.config import get_secret
 
 def medical_chatbot():
-    # Try multiple variations and strip whitespace
+    import os
+    
+    # 1. Proactive Safety: Ensure GROQ environment variables are strings
+    # Streamlit Cloud sometimes puts dicts/tables from Secrets into os.environ
+    for env_key in list(os.environ.keys()):
+        if env_key.startswith("GROQ_") and env_key != "GROQ_API_KEY":
+            if not isinstance(os.environ[env_key], str):
+                del os.environ[env_key]
+
+    # 2. Key Retrieval
     raw_key = get_secret("GROQ_API_KEY") or get_secret("Grok") or get_secret("groq_api_key")
+    
+    # Ensure it's a string or None
+    if raw_key is not None and not isinstance(raw_key, str):
+        # If it's a dict or other object, we can't use it directly
+        st.error(f"❌ Groq API Key found but it is format '{type(raw_key).__name__}'. Please make sure it is a simple string in your Secrets.")
+        st.stop()
+    
     api_key = str(raw_key).strip() if raw_key else None
     
     if not api_key or api_key in ["None", "", "your_key_here"]:
         st.error("❌ Groq API Key is missing or invalid.")
         st.markdown("""
-        The app is unable to find your **GROQ_API_KEY** in Streamlit Secrets.
-        
         **Please check your Secrets box for these common mistakes:**
         1. **Quotes**: Ensure it looks like `GROQ_API_KEY = "gsk_..."` (with quotes).
         2. **Typos**: Make sure there are no spaces in `GROQ_API_KEY`.
-        3. **Save**: Did you click the **'Save'** button at the bottom of the Secrets page?
+        3. **Section**: Don't put it in a `[section]` unless you know what you're doing.
         """)
         if st.button("I have updated my Secrets - Refresh App 🔄"):
             st.rerun()
         st.stop()
         
-    client = Groq(api_key=api_key)
+    try:
+        client = Groq(api_key=api_key)
+    except Exception as e:
+        st.error(f"Failed to initialize Chatbot: {e}")
+        st.stop()
 
     # Initialize chat history and selected model
     if "messages" not in st.session_state:
