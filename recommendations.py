@@ -84,7 +84,8 @@ def show_recommendations_page(symptoms_dict, symptoms_list, critical_diseases,
                             st.session_state.get("user_mail"), 
                             st.session_state.get("user_name"), 
                             disease, sev_status, symptoms, bmi,
-                            age, gender, existing, vitals
+                            age, gender, existing, vitals,
+                            st.session_state.get("user_phone", "")
                         )
                         status_box.update(label="Analysis Complete!", state="complete", expanded=False)
 

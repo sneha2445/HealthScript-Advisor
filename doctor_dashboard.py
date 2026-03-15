@@ -55,6 +55,7 @@ def show_doctor_dashboard(db):
                 
                 with col1:
                     st.write(f"**Name:** {record.get('patient_name')}")
+                    st.write(f"**Contact:** {record.get('patient_phone', 'N/A')}")
                     st.write(f"**Gender:** {record.get('gender', 'N/A')}")
                     st.write(f"**Age:** {record.get('age', 'N/A')} Years")
                     st.write(f"**Symptoms Selected:** {', '.join(record.get('symptoms', []))}")

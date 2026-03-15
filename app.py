@@ -87,7 +87,7 @@ def check_severity(spo2, temp, bp_sys):
         color = "orange"   
     return status, color, warnings
 
-def save_prediction_history(user_email, name, disease, status, symptoms, bmi, age, gender, existing_diseases, vitals):
+def save_prediction_history(user_email, name, disease, status, symptoms, bmi, age, gender, existing_diseases, vitals, phone):
     from firebase_admin import firestore
     data = {
         "user_email": user_email,
@@ -100,6 +100,7 @@ def save_prediction_history(user_email, name, disease, status, symptoms, bmi, ag
         "gender": gender,
         "existing_diseases": existing_diseases,
         "vitals": vitals,
+        "patient_phone": phone,
         "timestamp": firestore.SERVER_TIMESTAMP
     }
     try:
