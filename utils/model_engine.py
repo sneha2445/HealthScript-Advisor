@@ -25,7 +25,6 @@ def get_predicted_values(patient_symptoms, symptoms_df):
     return best_disease if best_disease else "Unknown"
 
 def get_disease_details(disease, data):
-    from utils.db_handler import get_ayurvedic_remedy
     details = {}
     
     # Description
