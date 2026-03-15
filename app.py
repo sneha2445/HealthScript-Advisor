@@ -6,9 +6,9 @@ from streamlit_option_menu import option_menu
 import pandas as pd
 import numpy as np
 import pickle
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import auth
+# import firebase_admin
+# from firebase_admin import credentials
+# from firebase_admin import auth
 import requests
 import json
 import ast
@@ -24,10 +24,18 @@ from typing import Generator
 from groq import Groq
 from langdetect import detect
 from translate import Translator
-from firebase_admin import firestore
+# from firebase_admin import firestore
 from google.auth import exceptions as google_exceptions
 warnings.filterwarnings("ignore")
 load_dotenv()
+try:
+    import firebase_admin
+    from firebase_admin import credentials
+    from firebase_admin import auth
+    from firebase_admin import firestore
+    firebase_available = True
+except ImportError:
+    firebase_available = False
 import streamlit as st
 
 from recommendations import show_recommendations
@@ -42,10 +50,10 @@ from profile_page import show_profile
 def get_db_mappings():
     try:
         conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="sneha", # Mysql password
-            database="docbuddy_db"
+            host=os.getenv("MYSQL_HOST", "localhost"),
+            user=os.getenv("MYSQL_USER", "root"),
+            password=os.getenv("MYSQL_PASSWORD", "sneha"), # Mysql password
+            database=os.getenv("MYSQL_DATABASE", "docbuddy_db")
         )
         cursor = conn.cursor()
         
@@ -94,27 +102,51 @@ def get_db_mappings():
 # Data Load 
 symptoms_dict, diseases_list, symptoms_list, critical_diseases = get_db_mappings()
 
-# init firebase app here.
-try:
-    # Try to initialize or refresh the Firebase app
+if firebase_available:
     try:
-        app = firebase_admin.get_app()
-        # If we reached here, the app is already initialized. 
-        # But if it was initialized with old/broken credentials, we might need to refresh.
-        # For safety in Streamlit, we check a session variable.
-        if not st.session_state.get('firebase_initialized', False):
-             firebase_admin.delete_app(app)
-             raise ValueError("Re-initializing")
-    except ValueError:
-        cred = credentials.Certificate("docbuddy-ai-firebase-adminsdk-fbsvc-a2af6aaab6.json")
-        firebase_admin.initialize_app(cred)
-        st.session_state.firebase_initialized = True
-    
-    firebase_working = True
-    st.session_state.firebase_available = True
-    db = firestore.client()
-except Exception as e:
-    print(f"Firebase initialization failed: {e}")
+        # Try to initialize or refresh the Firebase app
+        try:
+            app = firebase_admin.get_app()
+            # If we reached here, the app is already initialized. 
+            # But if it was initialized with old/broken credentials, we might need to refresh.
+            # For safety in Streamlit, we check a session variable.
+            if not st.session_state.get('firebase_initialized', False):
+                 firebase_admin.delete_app(app)
+                 raise ValueError("Re-initializing")
+        except ValueError:
+            cred = credentials.Certificate(os.getenv("FIREBASE_CREDENTIALS_PATH", "docbuddy-ai-firebase-adminsdk-fbsvc-a2af6aaab6.json"))
+            firebase_admin.initialize_app(cred)
+            st.session_state.firebase_initialized = True
+        
+        firebase_working = True
+        st.session_state.firebase_available = True
+        db = firestore.client()
+    except Exception as e:
+        print(f"Firebase initialization failed: {e}")
+        firebase_working = False
+        st.session_state.firebase_available = False
+        st.session_state.firebase_initialized = False
+        # Create a mock db object to prevent errors
+        class MockDB:
+            def collection(self, name):
+                return MockCollection()
+        class MockCollection:
+            def add(self, data):
+                pass
+            def stream(self):
+                return []
+            def document(self, doc_id):
+                return MockDocument()
+        class MockDocument:
+            def get(self):
+                return MockDoc()
+            def set(self, data, **kwargs):
+                pass
+        class MockDoc:
+            pass
+        db = MockDB()
+        print("Running in offline mode - Firebase not available")
+else:
     firebase_working = False
     st.session_state.firebase_available = False
     st.session_state.firebase_initialized = False
@@ -134,6 +166,8 @@ except Exception as e:
             return MockDoc()
         def set(self, data, **kwargs):
             pass
+    class MockDoc:
+        pass
     db = MockDB()
     print("Running in offline mode - Firebase not available")
 
@@ -149,19 +183,19 @@ hide_st_style = """<style>
 # setting up the page config here.
 st.set_page_config(
     page_title="HealthScript Advisor",
-    page_icon=r"static\\favicon.png",
+    page_icon="static/favicon.png",
     layout="wide",
     initial_sidebar_state="expanded",)
 
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
 # loading the dataset here
-symptom_data = pd.read_csv("Data\\symptoms_df.csv")
-precautions_data = pd.read_csv("Data\\precautions_df.csv")
-workout_data = pd.read_csv("Data\\workout_df.csv")
-desc_data = pd.read_csv("Data\\description.csv")
-diets_data = pd.read_csv("Data\\diets.csv")
-medication_data = pd.read_csv("Data\\medications.csv")
+symptom_data = pd.read_csv("Data/symptoms_df.csv")
+precautions_data = pd.read_csv("Data/precautions_df.csv")
+workout_data = pd.read_csv("Data/workout_df.csv")
+desc_data = pd.read_csv("Data/description.csv")
+diets_data = pd.read_csv("Data/diets.csv")
+medication_data = pd.read_csv("Data/medications.csv")
 
 # Replace 'nan' string and np.nan with None for consistency
 precautions_data.replace('nan', None, inplace=True)
@@ -191,7 +225,7 @@ if 'bmi' not in st.session_state:
 def get_ayurveda_remedies(disease_name):
     try:
         conn = mysql.connector.connect(
-            host="localhost", user="root", password="sneha", database="docbuddy_db" )
+            host=os.getenv("MYSQL_HOST", "localhost"), user=os.getenv("MYSQL_USER", "root"), password=os.getenv("MYSQL_PASSWORD", "sneha"), database=os.getenv("MYSQL_DATABASE", "docbuddy_db") )
         cursor = conn.cursor()
         query = "SELECT remedy_text FROM ayurvedic_remedies WHERE disease_name = %s"
         cursor.execute(query, (disease_name,))
