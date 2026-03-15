@@ -182,6 +182,10 @@ def account():
                     st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
 
                 if login_submit:
+                    if not login_input or not password:
+                        st.warning("Please enter both Email/Username and Password ⚠️")
+                        return
+
                     if not st.session_state.get("firebase_available", False):
                         st.error("❌ Firebase is not initialized. Please check your credentials file or Streamlit Secrets.")
                         return
