@@ -156,8 +156,9 @@ def account():
             #Login 
             if st.session_state.auth_mode == "Login":
                 st.subheader("Login to Your Account 🔐")
-                login_input = st.text_input("Email OR Username 📧 / 👤").strip()
-                password = st.text_input("Password 🔑", type="password")
+                st.markdown("*Use your registered Email or Username to log in:*")
+                login_input = st.text_input("Email / Username 📧👤", placeholder="e.g. john@mail.com or JohnDoe123").strip()
+                password = st.text_input("Password 🔑", type="password", help="Enter your secret password").strip()
 
                 col1, col2 = st.columns([2.5, 1.5])
                 with col1:
