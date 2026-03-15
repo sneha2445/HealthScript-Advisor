@@ -167,7 +167,7 @@ def account():
                     if st.button("Forgot Password?"):
                         st.session_state.show_forgot_pw = not st.session_state.get("show_forgot_pw", False)
                 
-                login_submit = st.button("Login", type="primary", width="stretch")
+                login_submit = st.button("Login", type="primary")
 
                 if st.session_state.get("show_forgot_pw", False):
                     st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
