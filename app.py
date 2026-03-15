@@ -7,8 +7,7 @@ import pandas as pd
 import numpy as np
 import pickle
 import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import auth
+from firebase_admin import credentials, auth, firestore
 import requests
 import json
 import ast
@@ -24,10 +23,8 @@ from typing import Generator
 from groq import Groq
 from langdetect import detect
 from translate import Translator
-from firebase_admin import firestore
 warnings.filterwarnings("ignore")
 load_dotenv()
-import streamlit as st
 
 from recommendations import show_recommendations
 from home import show_home
@@ -94,20 +91,8 @@ def get_db_mappings():
 symptoms_dict, diseases_list, symptoms_list, critical_diseases = get_db_mappings()
 
 try:
-    # Try to initialize or refresh the Firebase app
-    try:
-        app = firebase_admin.get_app()
-        # If we reached here, the app is already initialized. 
-        # But if it was initialized with old/broken credentials, we might need to refresh.
-        # For safety in Streamlit, we check a session variable.
-        if not st.session_state.get('firebase_initialized', False):
-             firebase_admin.delete_app(app)
-             raise ValueError("Re-initializing")
-    except ValueError:
-        cred = credentials.Certificate(os.getenv("FIREBASE_CREDENTIALS_PATH", "docbuddy-ai-firebase-adminsdk-fbsvc-a2af6aaab6.json"))
-        firebase_admin.initialize_app(cred)
-        st.session_state.firebase_initialized = True
-    
+    cred = credentials.Certificate(os.getenv("FIREBASE_CREDENTIALS_PATH", "docbuddy-ai-firebase-adminsdk-fbsvc-a2af6aaab6.json"))
+    firebase_admin.initialize_app(cred)
     firebase_working = True
     st.session_state.firebase_available = True
     db = firestore.client()
@@ -115,7 +100,6 @@ except Exception as e:
     print(f"Firebase initialization failed: {e}")
     firebase_working = False
     st.session_state.firebase_available = False
-    st.session_state.firebase_initialized = False
     # Create a mock db object to prevent errors
     class MockDB:
         def collection(self, name):
