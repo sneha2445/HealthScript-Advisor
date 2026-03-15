@@ -75,6 +75,9 @@ HealthScript Advisor Team 🩺"""
 
 def validate_username(username):
     """Check karega ki username unique aur sahi hai ya nahi"""
+    if not firebase_available:
+        return False, "Username validation unavailable due to Firebase configuration."
+    
     if len(username) < 8:
         return False, "Username must be at least 8 characters long."
     if not username.isalnum():
@@ -88,11 +91,8 @@ def validate_username(username):
         return True, ""
     except Exception as e:
         # If some other unexpected error occurs (e.g. network issue)
-    if not firebase_available:
-        st.error("Account and authentication features are currently unavailable due to Firebase configuration.")
-        return
         return False, f"Error validating username: {e}"
-    
+
 #  ACCOUNT CREATION & LOGIN 
 def account():
     # ---------------- SESSION STATES ----------------
