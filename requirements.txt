@@ -9,3 +9,4 @@ langdetect==1.0.9
 mysql-connector-python==8.2.0
 reportlab==4.0.7
 translate==3.6.1
+firebase-admin==6.4.0
