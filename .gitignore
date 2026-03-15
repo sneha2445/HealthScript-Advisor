@@ -1,0 +1,74 @@
+# Environment variables
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Firebase configuration
+.config/
+firebase-key.json
+docbuddy-ai-firebase-adminsdk-*.json
+# Keep other JSON files (like package.json, etc.)
+# *.json
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+
+# Byte-compiled / optimized / DLL files
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Streamlit
+.streamlit/
+
+# Unit test / coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Generated PDF reports (optional - remove if you want to track them)
+*.pdf
