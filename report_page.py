@@ -1,60 +1,54 @@
 import streamlit as st
+from utils.report_generator import generate_pdf_report
+import os
 
-def show_generate_report(generate_report_func):
+def show_generate_report():
     col1, col2 = st.columns([2, 1])
     with col1:
         if st.session_state.get("signedOut", False):
-            st.title(f"Welcome {st.session_state.user_name} 🎉")
-            st.header("HealthScript Advisor Medical Report Generation 📃")
+            st.title(f"Generate Medical Report 📃")
             st.divider()
             
-            col3, col4 = st.columns([2, 2])
-            with col3:
-                name = st.text_input("Enter the patient Name below", placeholder="Name")
-            with col4:
-                age = st.number_input("Enter the patient Age below", placeholder="Age", value=None, min_value=1, max_value=120)
+            c1, c2 = st.columns(2)
+            name = c1.text_input("Patient Name", placeholder="e.g. John Doe")
+            age = c2.number_input("Patient Age", min_value=1, max_value=120, value=25)
             
-            generate = st.button("Generate HealthScript Advisor Report ✨")
-            st.warning("⚠️ This is an automated AI generated report prepared by HealthScript Advisor.")
-            st.write("It's always better to see a Doctor and consult them before taking any step further!")
-            st.divider()
-            
-            if generate:
-                if st.session_state.predicted:
-                    if name and age:
-                        # Yahan generate_report_func aayega taaki error na aaye
-                        generate_report_func(
-                            name,
-                            age,
-                            disease=st.session_state.disease,
-                            description=st.session_state.description,
-                            precautions=st.session_state.precautions,
-                            workouts=st.session_state.workout,
-                            diets=st.session_state.diets,
-                            medications=st.session_state.medications,
-                            vitals=st.session_state.vitals,
-                            bmi=st.session_state.bmi,
-                            file_path=f"DocBuddy_{name.title()}_Report.pdf"
-                        )
-                        with open(f"DocBuddy_{name.title()}_Report.pdf", "rb") as file:
-                            st.download_button(
-                                label="Download Generated Report ✅",
-                                data=file,
-                                file_name=f"DocBuddy_{name.title()}_Report.pdf",
-                                mime="pdf",
-                            )
+            if st.button("Generate Health Report ✨", use_container_width=True):
+                if st.session_state.get("predicted"):
+                    if name:
+                        file_path = f"DocBuddy_{name.replace(' ', '_')}_Report.pdf"
+                        try:
+                            with st.spinner("Generating PDF..."):
+                                generate_pdf_report(
+                                    name, age,
+                                    st.session_state.disease,
+                                    st.session_state.description,
+                                    st.session_state.precautions,
+                                    st.session_state.workout,
+                                    st.session_state.diets,
+                                    st.session_state.medications,
+                                    st.session_state.vitals,
+                                    st.session_state.bmi,
+                                    file_path
+                                )
+                            
+                            with open(file_path, "rb") as f:
+                                st.download_button(
+                                    label="Download PDF Report ✅",
+                                    data=f,
+                                    file_name=file_path,
+                                    mime="application/pdf",
+                                    use_container_width=True
+                                )
+                            st.success("Report generated successfully!")
+                        except Exception as e:
+                            st.error(f"Error generating report: {e}")
                     else:
-                        st.warning("⚠️ Please enter correct Name/Age to proceed")
+                        st.warning("Please enter a patient name.")
                 else:
-                    st.warning("⚠️ It seems like you haven't got your Recommendations!")
-                    st.markdown("* Go to `Recommendations` tab first on the top left sidebar.")
-                    st.markdown("* Get your `Recommendations` there first.")
-                    st.markdown("* Then comeback here and apply for `Report Generation`.")
+                    st.warning("No prediction data found. Please go to the Recommendations page first.")
         else:
-            st.title("Please Login First ⚠️")
-            st.subheader("Log in first, to Generate Report")
-            st.markdown("* Please go back to the Account section.")
-            st.markdown("* Then go to the Login Page and Login Yourself.")
+            st.info("Please log in to generate reports.")
             
     with col2:
-        st.image(r"static\\DocBuddy-Generate-Report.png")
+        st.image("static/DocBuddy-Generate-Report.png")

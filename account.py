@@ -19,9 +19,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # GMAIL OTP SETTINGS & HELP
-SENDER_EMAIL = "healthscriptadvisor@gmail.com"
-SENDER_PASSWORD = "igbj qeib dhzt ieek"
-API_KEY = "AIzaSyB0hr19-_e1nkSjTttPBRT66ZvZ0vhcyyc" # Firebase Web API Key
+SENDER_EMAIL = os.getenv("SENDER_EMAIL", "healthscriptadvisor@gmail.com")
+SENDER_PASSWORD = os.getenv("SENDER_PASSWORD")
+API_KEY = os.getenv("FIREBASE_WEB_API_KEY") 
 countries = {
     "India (+91)": "+91",
     "USA (+1)": "+1",
