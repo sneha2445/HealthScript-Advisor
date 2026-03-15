@@ -33,7 +33,7 @@ def get_disease_details(disease, data):
     
     # Precautions
     prec_row = data["precautions"][data["precautions"]['Disease'] == disease]
-    details["precautions"] = prec_row.values[0][2:] if not prec_row.empty else []
+    details["precautions"] = prec_row.values[0][2:].tolist() if not prec_row.empty else []
     
     # Medications
     med_row = data["medications"][data["medications"]['Disease'] == disease]
@@ -41,7 +41,7 @@ def get_disease_details(disease, data):
     
     # Workout
     work_row = data["workout"][data["workout"]['disease'] == disease]
-    details["workout"] = work_row["workout"].values if not work_row.empty else []
+    details["workout"] = work_row["workout"].tolist() if not work_row.empty else []
     
     # Diet
     diet_row = data["diets"][data["diets"]['Disease'] == disease]

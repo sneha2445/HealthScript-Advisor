@@ -46,7 +46,7 @@ def generate_pdf_report(name, age, disease, description, precautions, workouts, 
 
     # Lists
     def add_list_section(title, items, bullet='bullet'):
-        if items:
+        if items is not None and len(items) > 0:
             story.append(Paragraph(title, styleH2))
             story.append(Spacer(1, 6))
             list_items = [ListItem(Paragraph(str(item), styleN)) for item in items if item]
