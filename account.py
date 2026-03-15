@@ -157,15 +157,20 @@ def account():
             if st.session_state.auth_mode == "Login":
                 st.subheader("Login to Your Account 🔐")
                 st.markdown("*Use your registered Email or Username to log in:*")
-                login_input = st.text_input("Email / Username 📧👤", placeholder="e.g. john@mail.com or JohnDoe123").strip()
-                password = st.text_input("Password 🔑", type="password", help="Enter your secret password").strip()
-
-                col1, col2 = st.columns([2.5, 1.5])
-                with col1:
-                    if st.button("Forgot Password?"):
-                        st.session_state.show_forgot_pw = not st.session_state.get("show_forgot_pw", False)
                 
-                login_submit = st.button("Login")
+                with st.form("login_form", clear_on_submit=False):
+                    login_input = st.text_input("Email / Username 📧👤", placeholder="e.g. john@mail.com or JohnDoe123").strip()
+                    password = st.text_input("Password 🔑", type="password", help="Enter your secret password").strip()
+                    
+                    col1, col2 = st.columns([2.5, 1.5])
+                    with col1:
+                        forgot_pw = st.form_submit_button("Forgot Password?", use_container_width=True)
+                    with col2:
+                        login_submit = st.form_submit_button("Login", type="primary", use_container_width=True)
+
+                if forgot_pw:
+                    st.session_state.show_forgot_pw = not st.session_state.get("show_forgot_pw", False)
+                    st.rerun()
 
                 if st.session_state.get("show_forgot_pw", False):
                     st.markdown("<hr style='margin: 10px 0;'>", unsafe_allow_html=True)
