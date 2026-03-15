@@ -1,7 +1,11 @@
 import streamlit as st
 import os
-import firebase_admin
-from firebase_admin import auth
+try:
+    import firebase_admin
+    from firebase_admin import auth
+    firebase_available = True
+except ImportError:
+    firebase_available = False
 import requests
 import re
 import smtplib
@@ -46,6 +50,10 @@ HealthScript Advisor Team 🩺"""
 
 def show_profile():
     """Render the Profile Update page — only shown to logged-in users."""
+
+    if not firebase_available:
+        st.error("Profile update feature is currently unavailable due to Firebase configuration.")
+        return
 
     if not st.session_state.get("signOut", False):
         st.warning("🔒 Please log in to access your profile.")
