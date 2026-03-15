@@ -1,11 +1,16 @@
 import streamlit as st
-import os
 from groq import Groq
 from typing import Generator
+from utils.config import get_secret
 
 def medical_chatbot():
     # connecting to groq cloud here.
-    client = Groq(api_key=os.getenv("Grok"))
+    api_key = get_secret("Grok")
+    if not api_key:
+        st.error("❌ Groq API Key ('Grok') is missing. Please add it to your Streamlit Secrets or .env file.")
+        st.stop()
+        
+    client = Groq(api_key=api_key)
 
     # Initialize chat history and selected model
     if "messages" not in st.session_state:
