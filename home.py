@@ -22,5 +22,4 @@ def show_home():
         st.markdown("HealthScript Advisor is here to help you live your healthiest life!")
 
     with col2:
-        # Image file ka naam wahi rakha hai jo aapke folder mein hai
-        st.image(r"static\\DocBuddy-Home.png")
+        st.image("static/DocBuddy-Home.png")

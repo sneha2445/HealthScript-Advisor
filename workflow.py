@@ -31,4 +31,4 @@ def show_workflow():
         ''')
 
     with col2:
-        st.image(r"static\\DocBuddy-WorkFlow-Tab.png")
+        st.image("static/DocBuddy-WorkFlow-Tab.png")
