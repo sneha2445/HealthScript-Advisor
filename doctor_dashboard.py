@@ -5,11 +5,11 @@ from firebase_admin import firestore
 def show_doctor_dashboard(db):
     # --- DOCTOR PROFILE HEADER ---
     st.markdown("""
-        <div style='background-color:#003366; padding:20px; border-radius:10px; color:white; margin-bottom:25px;'>
-            <h2 style='margin:0;'>👨‍⚕️ DR. Pramoad Suryakant Tripathi</h2>
-            <p style='font-size:18px; margin:5px 0;'><b>MBBS | 10+ Years of Experience</b></p>
-            <p style='margin:2px 0;'>📍 Clinic Center: Indira Nagar, Thane West, 400604, Mumbai, Maharashtra</p>
-            <p style='margin:2px 0;'>⏰ Timing: 10:00 AM - 11:00 PM</p>
+        <div style='background-color:#003366; padding:20px; border-radius:10px; color:white !important; margin-bottom:25px;'>
+            <h2 style='margin:0; color:white;'>👨‍⚕️ DR. Pramoad Tripathi</h2>
+            <p style='font-size:18px; margin:5px 0; color:white;'><b>MBBS | 10+ Years of Experience</b></p>
+            <p style='margin:2px 0; color:white;'>📍 Clinic Center: Indira Nagar, Thane West, 400604, Mumbai, Maharashtra</p>
+            <p style='margin:2px 0; color:white;'>⏰ Timing: 10:00 AM - 11:00 PM</p>
         </div>
     """, unsafe_allow_html=True)
 
