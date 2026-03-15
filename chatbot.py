@@ -4,16 +4,22 @@ from typing import Generator
 from utils.config import get_secret
 
 def medical_chatbot():
-    # Try the standard name first, then the fallback 'Grok'
-    api_key = get_secret("GROQ_API_KEY") or get_secret("Grok")
+    # Try multiple variations and strip whitespace
+    raw_key = get_secret("GROQ_API_KEY") or get_secret("Grok") or get_secret("groq_api_key")
+    api_key = str(raw_key).strip() if raw_key else None
     
-    if not api_key:
-        st.error("❌ Groq API Key is missing.")
-        st.info("""
-        **How to fix this:**
-        1. **On Streamlit Cloud:** Add `GROQ_API_KEY = "your_key_here"` to your **Secrets**.
-        2. **On your Computer:** Add `GROQ_API_KEY=your_key_here` to your `.env` file.
+    if not api_key or api_key in ["None", "", "your_key_here"]:
+        st.error("❌ Groq API Key is missing or invalid.")
+        st.markdown("""
+        The app is unable to find your **GROQ_API_KEY** in Streamlit Secrets.
+        
+        **Please check your Secrets box for these common mistakes:**
+        1. **Quotes**: Ensure it looks like `GROQ_API_KEY = "gsk_..."` (with quotes).
+        2. **Typos**: Make sure there are no spaces in `GROQ_API_KEY`.
+        3. **Save**: Did you click the **'Save'** button at the bottom of the Secrets page?
         """)
+        if st.button("I have updated my Secrets - Refresh App 🔄"):
+            st.rerun()
         st.stop()
         
     client = Groq(api_key=api_key)
