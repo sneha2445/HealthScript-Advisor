@@ -106,10 +106,14 @@ def get_ayurvedic_remedy(disease_name):
     if os.path.exists("Data/ayurveda.csv"):
         try:
             df = pd.read_csv("Data/ayurveda.csv")
-            match = df[df["Disease"].str.lower() == disease_name.lower()]
+            # Stripping both search key and dataframe column to avoid space-related mismatches
+            clean_search = str(disease_name).strip().lower()
+            df["Disease_Clean"] = df["Disease"].str.strip().str.lower()
+            
+            match = df[df["Disease_Clean"] == clean_search]
             if not match.empty:
                 return match["Remedy"].values[0]
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"CSV Remedy Error: {e}")
             
     return "No specific Ayurvedic remedy found in database. Please consult an Ayurvedic practitioner."
